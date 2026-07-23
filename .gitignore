@@ -1,0 +1,13 @@
+# build artifacts
+app/cryptonote-bin
+*.o
+Cryptonote.app/
+build/
+
+# python
+.venv/
+__pycache__/
+*.pyc
+
+# macOS
+.DS_Store
