@@ -39,6 +39,7 @@ It deliberately does not encrypt anything. This is protection against a glance, 
 - **Instant reveal.** Switch the display font back and the same text reads normally. Nothing to decrypt.
 - **Works in real editors.** Set the font in TextEdit, Pages, VS Code, Terminal, and any field that lets you choose a font.
 - **Covers Safari too.** A menu-bar scratchpad holds the scrambled text and copies the real text for pasting into fixed-font fields.
+- **Many languages.** Latin, Greek, and Cyrillic scripts are all scrambled, which covers most of the world's widely spoken languages that use them.
 - **Adjustable text size.** A slider in the scratchpad sets the font size to whatever you prefer.
 - **No installation of dependencies to run the app.** The font is bundled inside the app and registered at runtime.
 - **Deterministic and reversible.** The scramble is a fixed seeded derangement, so every character maps to a different one and the mapping never drifts.
@@ -65,6 +66,12 @@ Because the bytes never change, the consequences follow on their own.
 | Turn the mode off | switch the display font back, same text, now readable |
 
 The scramble is generated once from a fixed seed, and every visible character maps to a different visible character. Regenerate it with a new seed to get a fresh mapping.
+
+## Languages and scripts
+
+Cryptonote scrambles any language written in the Latin, Greek, or Cyrillic scripts, because the font carries glyphs for all three. That includes English, Spanish, Portuguese, French, German, Italian, Polish, Turkish, Vietnamese, Indonesian, Russian, Ukrainian, Greek, and many more.
+
+Three of the world's largest languages are not covered yet. Chinese, Japanese, and Korean need a separate large font that is not bundled. Arabic and Devanagari, the script of Hindi, rely on contextual shaping that a glyph-swap font cannot reproduce, so they fall outside this technique. Text written in an unsupported script stays readable rather than scrambled, so treat the protection as covering the Latin, Greek, and Cyrillic families.
 
 ## Requirements
 
