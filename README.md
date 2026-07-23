@@ -1,18 +1,14 @@
 <div align="center">
 
-# 🔒 Cryptonote
+# Cryptonote
 
-### Type in plain sight. Let the screen lie for you.
+### On-screen text scrambling for macOS that keeps the real characters underneath.
 
-**Cryptonote scrambles what appears on your screen while every app, search box, and your clipboard receive the *real* text.** Shoulder-surfers see nonsense; your work stays correct. Flip the mode off and the same text reveals itself.
+</div>
 
-<br>
+Cryptonote makes anything you type render as unreadable glyphs on screen, while every app, search box, and your clipboard still receive the true text. A person glancing at your screen sees nonsense. Your search still runs, your note still saves, your message still sends. Turn the mode off and the same text becomes readable again.
 
-`type: how many money does elon musk has`
-`screen shows: igl dhqr dgqcr ygck cugq dvkz ihk`
-`app receives: how many money does elon musk has`
-
-<br>
+<div align="center">
 
 ![platform](https://img.shields.io/badge/platform-macOS%2012%2B-000000?style=flat-square)
 ![language](https://img.shields.io/badge/Swift-6.1-F05138?style=flat-square)
@@ -21,118 +17,149 @@
 
 </div>
 
----
-
-## Why
-
-You're on a train, in a café, in an open office. Someone glances at your screen — a password hint, a private search, a message they shouldn't read. **Cryptonote** makes anything you type render as unreadable glyphs, without changing a single byte of the underlying text. The search still runs. The note still saves. The clipboard still pastes the truth. Only the *pixels* lie.
-
-## How it actually works
-
-There is **no supported way on macOS** to make an arbitrary app draw text differently from what it holds — apps render their own buffers, and System Integrity Protection blocks injecting a display filter into other processes. So Cryptonote doesn't touch your text at all.
-
-**It changes the _font_, not the text.**
-
-`Cryptonote.ttf` is an ordinary font whose glyph table is remapped: the outline drawn for `a` is secretly some other letter's outline. The character `a` is still really `a` in memory.
-
-```
- you type    "a"  "b"  "c"  "d"  "e"  "f"  ...   real Unicode, untouched
-                │    │    │    │    │    │
- font draws    ▼    ▼    ▼    ▼    ▼    ▼
-              "q"  "x"  "k"  "j"  "c"  "m"  ...   scrambled glyphs on screen
+```text
+you type       how many money does elon musk has
+screen shows   igl dhqr dgqcr ygck cugq dvkz ihk
+apps receive   how many money does elon musk has
 ```
 
-The consequences fall out for free:
+## What is this
 
-| | Result |
-|---|---|
-| 👁️ **Screen** | scrambled glyphs — a glance reveals nothing |
-| 📋 **Copy / paste** | the true characters |
-| 🔍 **Search engines / forms** | the true query |
-| 💾 **Save to disk** | the true text |
-| 🔓 **"Turn off the mode"** | switch the display font back — same text, now readable |
+Cryptonote is a privacy tool for anyone who types in places where other people can see the screen. On a train, in a café, in an open office, a single glance can expose a private search, a draft message, or a hint about a password. Cryptonote turns what appears on screen into glyphs nobody can read, without altering a single byte of the underlying text.
 
-The scramble is a fixed, seeded derangement (every visible character maps to a *different* one), so it is deterministic and perfectly reversible.
+It exists because macOS offers no supported way to make an arbitrary app draw text differently from what it holds. Apps render their own buffers, and System Integrity Protection blocks injecting a display filter into other processes. So Cryptonote never touches your text. It changes the font instead. `Cryptonote.ttf` is an ordinary font whose glyph table has been remapped, so the outline drawn for the letter `a` is really some other letter's outline, while the character in memory stays a true `a`.
 
-## Two ways to use it
+It deliberately does not encrypt anything. This is protection against a glance, not against an analyst. Read the security notes below before relying on it.
 
-### 1 · The font — for editors and documents
+## Highlights
 
-Install `Cryptonote.ttf` and set it as the display font anywhere you can choose one:
+- **The real text is never altered.** Copy, paste, search, and save all receive the true characters, because only the glyph shapes change.
+- **Instant reveal.** Switch the display font back and the same text reads normally. Nothing to decrypt.
+- **Works in real editors.** Set the font in TextEdit, Pages, VS Code, Terminal, and any field that lets you choose a font.
+- **Covers Safari too.** A menu-bar scratchpad holds the scrambled text and copies the real text for pasting into fixed-font fields.
+- **No installation of dependencies to run the app.** The font is bundled inside the app and registered at runtime.
+- **Deterministic and reversible.** The scramble is a fixed seeded derangement, so every character maps to a different one and the mapping never drifts.
 
-| App | Where |
-|---|---|
-| **TextEdit** | Format → Font → Cryptonote |
-| **Pages / Word** | font picker |
-| **VS Code** | `"editor.fontFamily": "Cryptonote"` |
-| **Terminal / iTerm** | Profile → Font → Cryptonote |
-| **Notes** | any text box styled with it |
+## How it works
 
-To **decrypt**, switch the font back to a normal one (e.g. Menlo). Same text, instantly readable.
+You type real Unicode. The font draws each character as a different one.
+
+```text
+ you type    "a"  "b"  "c"  "d"  "e"  "f"     real Unicode, untouched
+              |    |    |    |    |    |
+ font draws   v    v    v    v    v    v
+             "q"  "x"  "k"  "j"  "c"  "m"     scrambled glyphs on screen
+```
+
+Because the bytes never change, the consequences follow on their own.
+
+| Surface | Result |
+| --- | --- |
+| Screen | scrambled glyphs, a glance reveals nothing |
+| Copy and paste | the true characters |
+| Search engines and forms | the true query |
+| Save to disk | the true text |
+| Turn the mode off | switch the display font back, same text, now readable |
+
+The scramble is generated once from a fixed seed, and every visible character maps to a different visible character. Regenerate it with a new seed to get a fresh mapping.
+
+## Requirements
+
+- macOS 12 or newer
+- Xcode command line tools, which provide `swiftc`, only if you build the app from source
+- Python 3.11 or newer and `fonttools`, only if you regenerate the font
+
+Neither Python nor Swift is needed to simply install the font and use it in an editor.
+
+## Install
+
+Install the font for your user.
 
 ```bash
-# one-click install for your user
-open install.command      # → copies the font to ~/Library/Fonts
+open install.command      # copies Cryptonote.ttf into ~/Library/Fonts
 ```
 
-### 2 · The menu-bar app — for Safari and everywhere else
-
-Some fields (Safari's address/search bar, menu chrome) have a fixed font you can't change. `Cryptonote.app` is a native menu-bar scratchpad that covers them:
-
-- Launch it → a **🔒** appears in the menu bar (no dock icon).
-- Click **🔒** → a scratchpad drops down. Type: the screen shows scrambled glyphs, the buffer holds the real text.
-- **Reveal (Crypt: ON/OFF)** — flip between scrambled and readable on screen.
-- **Copy real text** — puts the true characters on the clipboard.
-
-**Safari flow:** click 🔒 → type your private query (gibberish on screen) → *Copy real text* → click Safari's search bar → ⌘V. Safari runs the real search; anyone watching saw only noise.
+Run the menu-bar app.
 
 ```bash
-open /Applications/Cryptonote.app      # after install, 🔒 lives in your menu bar
+open /Applications/Cryptonote.app      # a lock icon appears in the menu bar
 ```
 
-## Try it right now
+## Usage
 
-`demo.html` is a self-contained page (font embedded, no server) that demonstrates the full effect — type, watch the screen scramble, see the real text mirrored, toggle reveal, copy the truth. Just double-click it.
+### The font, for editors and documents
+
+Install `Cryptonote.ttf`, then set it as the display font wherever you can pick one.
+
+| App | Where to set it |
+| --- | --- |
+| TextEdit | Format, then Font, then Cryptonote |
+| Pages and Word | the font picker |
+| VS Code | set `editor.fontFamily` to `Cryptonote` |
+| Terminal and iTerm | Profile, then Font, then Cryptonote |
+| Notes | any text box styled with it |
+
+To reveal, switch the font back to a normal one such as Menlo. The same text becomes readable at once.
+
+### The menu-bar app, for Safari and everywhere else
+
+Some fields have a fixed font you cannot change, including Safari's address bar and the menu bar itself. The scratchpad app covers them.
+
+1. Launch the app. A lock icon appears in the menu bar with no dock icon.
+2. Click the icon. A scratchpad drops down. Type into it, and the screen shows scrambled glyphs while the buffer holds the real text.
+3. Use **Reveal** to flip between scrambled and readable on screen.
+4. Use **Copy real text** to put the true characters on the clipboard.
+
+For a private Safari search, click the icon, type your query so it shows as nonsense on screen, press **Copy real text**, click Safari's search bar, and paste. Safari runs the real query while anyone watching saw only noise.
+
+## Try it now
+
+`demo.html` is a self-contained page with the font embedded, so it needs no server. Double-click it to type, watch the screen scramble, see the real text mirrored, toggle reveal, and copy the true characters.
 
 ## Build from source
 
-Requires the Xcode command-line tools (`swiftc`) and, only if you want to regenerate the font, Python + `fonttools`.
+Build the menu-bar app.
 
 ```bash
-# build the menu-bar app
 cd app
 swiftc main.swift -o cryptonote-bin -framework Cocoa -framework CoreText
+```
 
-# assemble the .app bundle (font is bundled inside and registered at runtime)
-#   Contents/MacOS/Cryptonote          <- cryptonote-bin
-#   Contents/Resources/Cryptonote.ttf  <- the font
+Assemble the app bundle so the font ships inside it. Place `cryptonote-bin` at `Contents/MacOS/Cryptonote` and `Cryptonote.ttf` at `Contents/Resources/Cryptonote.ttf`, with an `Info.plist` that sets `LSUIElement` to true for a menu-bar app.
 
-# regenerate the font with a different scramble
-python3 -m venv .venv && ./.venv/bin/pip install fonttools
-./.venv/bin/python make_font.py        # edit SEED in the script to reshuffle
+Regenerate the font with a different scramble.
+
+```bash
+python3 -m venv .venv
+./.venv/bin/pip install fonttools
+./.venv/bin/python make_font.py      # edit SEED in the script to reshuffle
 ```
 
 ## Project structure
 
-```
+```text
 Cryptonote/
-├── README.md
-├── LICENSE
-├── make_font.py          # remaps a base monospace font's glyph table
-├── Cryptonote.ttf        # the font to install (full Menlo coverage)
-├── Cryptonote-web.ttf    # ASCII subset used by demo.html
-├── demo.html             # self-contained live demo / scratchpad
-├── install.command       # one-click user font install
-└── app/
-    └── main.swift        # native AppKit menu-bar scratchpad
+  README.md
+  LICENSE
+  make_font.py          remaps a base monospace font's glyph table
+  Cryptonote.ttf        the font to install, full Menlo coverage
+  Cryptonote-web.ttf    an ASCII subset used by demo.html
+  demo.html             self-contained live demo and scratchpad
+  install.command       one-click user font install
+  app/
+    main.swift          native AppKit menu-bar scratchpad
 ```
 
-## ⚠️ Honest limitations
+## Security notes
 
-- **It's a substitution cipher, not cryptography.** It defeats a glance or a shoulder-surfer — its actual purpose. It does **not** hide secrets from anyone who has the font file and a screenshot. Don't treat it as encryption.
-- **Fixed-font fields stay readable.** Safari's search bar, menu bars, and similar chrome can't be restyled; use the app's copy-paste for those.
-- **Not a system-wide transparent layer.** As explained above, macOS makes that impossible. Cryptonote is the honest, working approximation.
+Cryptonote is a substitution cipher expressed through glyph shapes. It is effective against a glance or a shoulder-surfer, which is its stated purpose. It is not cryptography. Anyone who has the font file and a screenshot can recover the text, so it must never be used to protect real secrets. The text on disk, in the clipboard, and in every app is always the true plaintext, because that is the whole point. Treat the scrambling as a screen-privacy measure only.
+
+## Limitations
+
+- It is a substitution cipher, not encryption. It defeats a glance, nothing stronger.
+- Fixed-font fields stay readable. Safari's search bar and menu chrome cannot be restyled, so use the scratchpad app for those.
+- It is not a transparent system-wide layer. As explained above, macOS makes that impossible, and Cryptonote is the honest working approximation.
 
 ## License
 
-MIT — see [LICENSE](LICENSE).
+MIT. See [LICENSE](LICENSE).
