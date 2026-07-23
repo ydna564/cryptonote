@@ -1,5 +1,6 @@
 # build artifacts
 app/cryptonote-bin
+assets/Cryptonote.icns
 *.o
 Cryptonote.app/
 build/

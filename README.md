@@ -1,5 +1,7 @@
 <div align="center">
 
+<img src="assets/cryptonote-icon.png" alt="Cryptonote icon" width="180">
+
 # Cryptonote
 
 ### On-screen text scrambling for macOS that keeps the real characters underneath.
@@ -118,14 +120,11 @@ For a private Safari search, click the icon, type your query so it shows as nons
 
 ## Build from source
 
-Build the menu-bar app.
+Build the whole app in one step. The script compiles the source, generates the icon from `assets/cryptonote-icon.png`, and assembles the bundle with the font and icon inside.
 
 ```bash
-cd app
-swiftc main.swift -o cryptonote-bin -framework Cocoa -framework CoreText
+bash app/package.sh      # produces Cryptonote.app in the repo root
 ```
-
-Assemble the app bundle so the font ships inside it. Place `cryptonote-bin` at `Contents/MacOS/Cryptonote` and `Cryptonote.ttf` at `Contents/Resources/Cryptonote.ttf`, with an `Info.plist` that sets `LSUIElement` to true for a menu-bar app.
 
 Regenerate the font with a different scramble.
 
@@ -146,8 +145,11 @@ Cryptonote/
   Cryptonote-web.ttf    an ASCII subset used by demo.html
   demo.html             self-contained live demo and scratchpad
   install.command       one-click user font install
+  assets/
+    cryptonote-icon.png the app icon source
   app/
     main.swift          native AppKit menu-bar scratchpad
+    package.sh          builds Cryptonote.app with the icon and font
 ```
 
 ## Security notes
