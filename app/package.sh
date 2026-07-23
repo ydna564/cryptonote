@@ -24,6 +24,7 @@ rm -rf "$APP"
 mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"
 cp app/cryptonote-bin "$APP/Contents/MacOS/Cryptonote"
 cp Cryptonote.ttf "$APP/Contents/Resources/Cryptonote.ttf"
+cp Cryptonote-CJK.ttf "$APP/Contents/Resources/Cryptonote-CJK.ttf"
 cp assets/Cryptonote.icns "$APP/Contents/Resources/Cryptonote.icns"
 
 cat > "$APP/Contents/Info.plist" <<'PLIST'

@@ -39,7 +39,7 @@ It deliberately does not encrypt anything. This is protection against a glance, 
 - **Instant reveal.** Switch the display font back and the same text reads normally. Nothing to decrypt.
 - **Works in real editors.** Set the font in TextEdit, Pages, VS Code, Terminal, and any field that lets you choose a font.
 - **Covers Safari too.** A menu-bar scratchpad holds the scrambled text and copies the real text for pasting into fixed-font fields.
-- **Many languages.** Latin, Greek, and Cyrillic scripts are all scrambled, which covers most of the world's widely spoken languages that use them.
+- **Many languages.** Latin, Greek, Cyrillic, and Chinese are all scrambled in the scratchpad, covering a large share of the world's most spoken languages.
 - **Adjustable text size.** A slider in the scratchpad sets the font size to whatever you prefer.
 - **No installation of dependencies to run the app.** The font is bundled inside the app and registered at runtime.
 - **Deterministic and reversible.** The scramble is a fixed seeded derangement, so every character maps to a different one and the mapping never drifts.
@@ -69,9 +69,11 @@ The scramble is generated once from a fixed seed, and every visible character ma
 
 ## Languages and scripts
 
-Cryptonote scrambles any language written in the Latin, Greek, or Cyrillic scripts, because the font carries glyphs for all three. That includes English, Spanish, Portuguese, French, German, Italian, Polish, Turkish, Vietnamese, Indonesian, Russian, Ukrainian, Greek, and many more.
+The scratchpad app scrambles Latin, Greek, Cyrillic, and Chinese. The first three cover most of the world's widely spoken languages that use them, including English, Spanish, Portuguese, French, German, Italian, Polish, Turkish, Vietnamese, Indonesian, Russian, Ukrainian, and Greek. Chinese covers the full set of common Han characters through a bundled open font.
 
-Three of the world's largest languages are not covered yet. Chinese, Japanese, and Korean need a separate large font that is not bundled. Arabic and Devanagari, the script of Hindi, rely on contextual shaping that a glyph-swap font cannot reproduce, so they fall outside this technique. Text written in an unsupported script stays readable rather than scrambled, so treat the protection as covering the Latin, Greek, and Cyrillic families.
+A few of the world's largest languages remain out of scope. Japanese and Korean are not bundled yet, though the same method would work for them. Arabic and Devanagari, the script of Hindi, rely on contextual shaping that a glyph-swap font cannot reproduce, so they fall outside this technique. Text written in an unsupported script stays readable rather than scrambled.
+
+One detail on where each script is covered. Latin, Greek, and Cyrillic scramble both in the app and when you set the Cryptonote font directly in an editor. Chinese scrambling relies on the app's font cascade, so it is covered in the scratchpad rather than through a single editor font.
 
 ## Requirements
 
@@ -150,15 +152,17 @@ Cryptonote/
   README.md
   LICENSE
   make_font.py          remaps a base monospace font's glyph table
-  Cryptonote.ttf        the font to install, full Menlo coverage
-  Cryptonote-web.ttf    an ASCII subset used by demo.html
+  make_cjk.py           builds the Chinese scramble font from Noto Sans SC
+  Cryptonote.ttf        Latin, Greek and Cyrillic font to install
+  Cryptonote-CJK.ttf    Chinese Han scramble font, bundled in the app
+  Cryptonote-web.ttf    a subset used by demo.html
   demo.html             self-contained live demo and scratchpad
   install.command       one-click user font install
   assets/
     cryptonote-icon.png the app icon source
   app/
     main.swift          native AppKit menu-bar scratchpad
-    package.sh          builds Cryptonote.app with the icon and font
+    package.sh          builds Cryptonote.app with the icon and fonts
 ```
 
 ## Security notes
@@ -171,6 +175,10 @@ Cryptonote is a substitution cipher expressed through glyph shapes. It is effect
 - Fixed-font fields stay readable. Safari's search bar and menu chrome cannot be restyled, so use the scratchpad app for those.
 - It is not a transparent system-wide layer. As explained above, macOS makes that impossible, and Cryptonote is the honest working approximation.
 
+## Acknowledgements
+
+Chinese coverage is built from Noto Sans SC by Google, licensed under the SIL Open Font License. The full license text is in [assets/NotoSansSC-OFL.txt](assets/NotoSansSC-OFL.txt).
+
 ## License
 
-MIT. See [LICENSE](LICENSE).
+The Cryptonote code is MIT. See [LICENSE](LICENSE). The bundled Chinese font derives from Noto Sans SC and stays under the SIL Open Font License noted above.

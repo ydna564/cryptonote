@@ -11,23 +11,33 @@ let defaultSize: CGFloat = 20
 let minSize: CGFloat = 10
 let maxSize: CGFloat = 48
 
+let cjkFontName = "CryptonoteCJK"
+
 func registerCryptFont() {
-    // Runtime-register the font so no system install is required.
-    // Prefer the copy bundled inside the .app; fall back to ~/Cryptonote.
-    var url: URL
-    if let bundled = Bundle.main.url(forResource: "Cryptonote", withExtension: "ttf") {
-        url = bundled
-    } else {
-        let path = ("~/Cryptonote/Cryptonote.ttf" as NSString).expandingTildeInPath
-        url = URL(fileURLWithPath: path)
+    // Runtime-register the fonts so no system install is required.
+    // Prefer the copies bundled inside the .app; fall back to ~/Cryptonote.
+    for base in ["Cryptonote", "Cryptonote-CJK"] {
+        var url: URL
+        if let bundled = Bundle.main.url(forResource: base, withExtension: "ttf") {
+            url = bundled
+        } else {
+            let path = ("~/Cryptonote/\(base).ttf" as NSString).expandingTildeInPath
+            url = URL(fileURLWithPath: path)
+        }
+        var err: Unmanaged<CFError>?
+        CTFontManagerRegisterFontsForURL(url as CFURL, .process, &err)
     }
-    var err: Unmanaged<CFError>?
-    CTFontManagerRegisterFontsForURL(url as CFURL, .process, &err)
 }
 
 func cryptFont(_ size: CGFloat) -> NSFont {
-    NSFont(name: cryptFontName, size: size)
+    // Primary font scrambles Latin, Greek and Cyrillic. Chinese characters are
+    // absent from it, so a cascade sends them to the scrambled CJK font instead
+    // of the system font, which would otherwise show them as readable.
+    let base = NSFont(name: cryptFontName, size: size)
         ?? NSFont.monospacedSystemFont(ofSize: size, weight: .regular)
+    let cjk = NSFontDescriptor(fontAttributes: [.name: cjkFontName])
+    let desc = base.fontDescriptor.addingAttributes([.cascadeList: [cjk]])
+    return NSFont(descriptor: desc, size: size) ?? base
 }
 func plainFont(_ size: CGFloat) -> NSFont {
     NSFont.monospacedSystemFont(ofSize: size, weight: .regular)
