@@ -39,6 +39,7 @@ It deliberately does not encrypt anything. This is protection against a glance, 
 - **Instant reveal.** Switch the display font back and the same text reads normally. Nothing to decrypt.
 - **Works in real editors.** Set the font in TextEdit, Pages, VS Code, Terminal, and any field that lets you choose a font.
 - **Covers Safari too.** A menu-bar scratchpad holds the scrambled text and copies the real text for pasting into fixed-font fields.
+- **Adjustable text size.** A slider in the scratchpad sets the font size to whatever you prefer.
 - **No installation of dependencies to run the app.** The font is bundled inside the app and registered at runtime.
 - **Deterministic and reversible.** The scramble is a fixed seeded derangement, so every character maps to a different one and the mapping never drifts.
 
@@ -111,6 +112,7 @@ Some fields have a fixed font you cannot change, including Safari's address bar 
 2. Click the icon. A scratchpad drops down. Type into it, and the screen shows scrambled glyphs while the buffer holds the real text.
 3. Use **Reveal** to flip between scrambled and readable on screen.
 4. Use **Copy real text** to put the true characters on the clipboard.
+5. Drag the size slider to set the font size you want.
 
 For a private Safari search, click the icon, type your query so it shows as nonsense on screen, press **Copy real text**, click Safari's search bar, and paste. Safari runs the real query while anyone watching saw only noise.
 
