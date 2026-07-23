@@ -129,20 +129,33 @@ For a private Safari search, click the icon, type your query so it shows as nons
 
 `demo.html` is a self-contained page with the font embedded, so it needs no server. Double-click it to type, watch the screen scramble, see the real text mirrored, toggle reveal, and copy the true characters.
 
-## Build from source
+## Two builds, with or without Chinese
 
-Build the whole app in one step. The script compiles the source, generates the icon from `assets/cryptonote-icon.png`, and assembles the bundle with the font and icon inside.
+Chinese carries a size cost. The Han script has tens of thousands of distinct characters, and each one needs its own outline, so the bundled Chinese font is about 7 MB. Everything else fits in well under 1 MB. To keep that cost optional, the app builds in two variants.
+
+| Build | Scripts scrambled | App size |
+| --- | --- | --- |
+| Lite | Latin, Greek, Cyrillic | about 1 MB |
+| Full | Latin, Greek, Cyrillic, Chinese | about 8 MB |
+
+The app binary is identical in both. The only difference is whether `Cryptonote-CJK.ttf` is bundled. In the lite build, Chinese characters are left readable rather than scrambled, and every other script still works.
 
 ```bash
-bash app/package.sh      # produces Cryptonote.app in the repo root
+bash app/package.sh          # full build, includes Chinese
+bash app/package.sh lite     # lean build, no Chinese, about 7 MB smaller
 ```
 
-Regenerate the font with a different scramble.
+## Build from source
+
+The command above compiles the source, generates the icon from `assets/cryptonote-icon.png`, and assembles `Cryptonote.app` in the repo root with the fonts and icon inside. Pick the variant that fits your needs from the table above.
+
+Regenerate the fonts with a different scramble.
 
 ```bash
 python3 -m venv .venv
 ./.venv/bin/pip install fonttools
-./.venv/bin/python make_font.py      # edit SEED in the script to reshuffle
+./.venv/bin/python make_font.py      # Latin, Greek, Cyrillic. Edit SEED to reshuffle
+./.venv/bin/python make_cjk.py       # Chinese. Downloads Noto Sans SC on first run
 ```
 
 ## Project structure

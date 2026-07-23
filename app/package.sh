@@ -1,10 +1,23 @@
 #!/bin/bash
-# Build Cryptonote.app from source, with the app icon and bundled font.
-# Run from the repository root:  bash app/package.sh
+# Build Cryptonote.app from source, with the app icon and bundled fonts.
+#
+# Two variants control whether the 7 MB Chinese font is bundled.
+#   bash app/package.sh          full build, includes Chinese (Han) scrambling
+#   bash app/package.sh lite     lean build, Latin, Greek and Cyrillic only
+#
+# The app binary is identical in both. Only Cryptonote-CJK.ttf differs, so the
+# lite build is about 7 MB smaller. Without that font, Chinese characters are
+# not scrambled and stay readable, while every other script still works.
 set -e
 cd "$(dirname "$0")/.."          # repo root
 ROOT="$(pwd)"
 APP="$ROOT/Cryptonote.app"
+
+VARIANT="${1:-full}"
+if [ "$VARIANT" != "full" ] && [ "$VARIANT" != "lite" ]; then
+  echo "Unknown variant '$VARIANT'. Use 'full' (default) or 'lite'." >&2
+  exit 1
+fi
 
 echo "Compiling..."
 swiftc app/main.swift -o app/cryptonote-bin -framework Cocoa -framework CoreText
@@ -24,8 +37,10 @@ rm -rf "$APP"
 mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"
 cp app/cryptonote-bin "$APP/Contents/MacOS/Cryptonote"
 cp Cryptonote.ttf "$APP/Contents/Resources/Cryptonote.ttf"
-cp Cryptonote-CJK.ttf "$APP/Contents/Resources/Cryptonote-CJK.ttf"
 cp assets/Cryptonote.icns "$APP/Contents/Resources/Cryptonote.icns"
+if [ "$VARIANT" = "full" ]; then
+  cp Cryptonote-CJK.ttf "$APP/Contents/Resources/Cryptonote-CJK.ttf"   # +7 MB, Chinese
+fi
 
 cat > "$APP/Contents/Info.plist" <<'PLIST'
 <?xml version="1.0" encoding="UTF-8"?>
@@ -45,4 +60,5 @@ cat > "$APP/Contents/Info.plist" <<'PLIST'
 PLIST
 
 touch "$APP"
-echo "Built $APP"
+SIZE=$(du -sh "$APP" | cut -f1)
+echo "Built $APP  (variant: $VARIANT, size: $SIZE)"
