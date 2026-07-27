@@ -52,35 +52,58 @@ final class ScratchVC: NSViewController {
     var size: CGFloat = defaultSize
 
     func currentFont() -> NSFont { crypt ? cryptFont(size) : plainFont(size) }
+    func fontFor(_ scrambled: Bool) -> NSFont { scrambled ? cryptFont(size) : plainFont(size) }
+
+    // A run is "scrambled" when it is drawn with the Cryptonote font.
+    func isCryptFont(_ f: NSFont?) -> Bool {
+        guard let f = f else { return true }
+        return f.fontName.contains(cryptFontName) || (f.familyName?.contains(cryptFontName) ?? false)
+    }
+
+    func setFont(_ scrambled: Bool, range: NSRange) {
+        guard range.length > 0, let ts = textView.textStorage else { return }
+        ts.addAttribute(.font, value: fontFor(scrambled), range: range)
+    }
 
     override func loadView() {
-        let root = NSView(frame: NSRect(x: 0, y: 0, width: 460, height: 360))
+        let root = NSView(frame: NSRect(x: 0, y: 0, width: 460, height: 420))
 
         // scrollable text area
-        let scroll = NSScrollView(frame: NSRect(x: 14, y: 92, width: 432, height: 254))
+        let scroll = NSScrollView(frame: NSRect(x: 14, y: 132, width: 432, height: 274))
         scroll.hasVerticalScroller = true
         scroll.borderType = .lineBorder
         scroll.autoresizingMask = [.width, .height]
         textView.frame = scroll.bounds
         textView.isEditable = true
-        textView.isRichText = false          // single font for the whole buffer
+        textView.isRichText = true           // allow per-range fonts for partial reveal
         textView.allowsUndo = true
         textView.textContainerInset = NSSize(width: 6, height: 8)
-        textView.font = currentFont()
+        textView.textColor = .textColor
+        textView.typingAttributes = [.font: currentFont(), .foregroundColor: NSColor.textColor]
         textView.string = "how many money does elon musk has"
+        let full = NSRange(location: 0, length: (textView.string as NSString).length)
+        textView.textStorage?.addAttribute(.font, value: cryptFont(size), range: full)
+        textView.textStorage?.addAttribute(.foregroundColor, value: NSColor.textColor, range: full)
         scroll.documentView = textView
         root.addSubview(scroll)
 
-        // Crypt toggle
-        toggleButton.frame = NSRect(x: 14, y: 50, width: 150, height: 30)
+        // Row 1: reveal the whole document (original toggle) or just the selection
+        toggleButton.frame = NSRect(x: 14, y: 90, width: 210, height: 30)
         toggleButton.bezelStyle = .rounded
-        toggleButton.title = "Reveal (Crypt: ON)"
+        toggleButton.title = "Reveal all (Crypt: ON)"
         toggleButton.target = self
         toggleButton.action = #selector(toggleCrypt)
         root.addSubview(toggleButton)
 
-        // Copy real text
-        let copyBtn = NSButton(frame: NSRect(x: 172, y: 50, width: 150, height: 30))
+        let revealSelBtn = NSButton(frame: NSRect(x: 232, y: 90, width: 214, height: 30))
+        revealSelBtn.bezelStyle = .rounded
+        revealSelBtn.title = "Reveal selection"
+        revealSelBtn.target = self
+        revealSelBtn.action = #selector(revealSelection)
+        root.addSubview(revealSelBtn)
+
+        // Row 2: copy the real text, or clear
+        let copyBtn = NSButton(frame: NSRect(x: 14, y: 52, width: 210, height: 30))
         copyBtn.bezelStyle = .rounded
         copyBtn.title = "Copy real text"
         copyBtn.keyEquivalent = "\r"
@@ -88,8 +111,7 @@ final class ScratchVC: NSViewController {
         copyBtn.action = #selector(copyReal)
         root.addSubview(copyBtn)
 
-        // Clear
-        let clearBtn = NSButton(frame: NSRect(x: 330, y: 50, width: 116, height: 30))
+        let clearBtn = NSButton(frame: NSRect(x: 232, y: 52, width: 214, height: 30))
         clearBtn.bezelStyle = .rounded
         clearBtn.title = "Clear"
         clearBtn.target = self
@@ -131,13 +153,37 @@ final class ScratchVC: NSViewController {
     @objc func sizeChanged() {
         size = CGFloat(sizeSlider.doubleValue.rounded())
         sizeLabel.stringValue = "\(Int(size)) pt"
-        textView.font = currentFont()
+        guard let ts = textView.textStorage else { return }
+        // Resize every run while keeping whether it is scrambled or revealed.
+        var runs: [(NSRange, Bool)] = []
+        ts.enumerateAttribute(.font, in: NSRange(location: 0, length: ts.length)) { v, r, _ in
+            runs.append((r, isCryptFont(v as? NSFont)))
+        }
+        ts.beginEditing()
+        for (r, scrambled) in runs { ts.addAttribute(.font, value: fontFor(scrambled), range: r) }
+        ts.endEditing()
+        textView.typingAttributes[.font] = currentFont()
     }
 
     @objc func toggleCrypt() {
+        // Whole-document reveal or scramble. This is the original behaviour.
         crypt.toggle()
-        textView.font = currentFont()
-        toggleButton.title = crypt ? "Reveal (Crypt: ON)" : "Scramble (Crypt: OFF)"
+        setFont(crypt, range: NSRange(location: 0, length: textView.textStorage?.length ?? 0))
+        textView.typingAttributes[.font] = currentFont()
+        toggleButton.title = crypt ? "Reveal all (Crypt: ON)" : "Scramble all (Crypt: OFF)"
+    }
+
+    @objc func revealSelection() {
+        // Reveal, or re-hide, only the range selected with the mouse.
+        guard let ts = textView.textStorage else { return }
+        let sel = textView.selectedRange()
+        guard sel.length > 0 else { NSSound.beep(); return }
+        var anyScrambled = false
+        ts.enumerateAttribute(.font, in: sel) { v, _, _ in
+            if isCryptFont(v as? NSFont) { anyScrambled = true }
+        }
+        // If any of the selection is still scrambled, reveal it. Otherwise hide it.
+        setFont(!anyScrambled, range: sel)
     }
 
     @objc func copyReal() {
@@ -148,6 +194,7 @@ final class ScratchVC: NSViewController {
 
     @objc func clearText() {
         textView.string = ""
+        textView.typingAttributes[.font] = currentFont()
         view.window?.makeFirstResponder(textView)
     }
 

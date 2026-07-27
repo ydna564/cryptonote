@@ -47,6 +47,7 @@ It deliberately does not encrypt anything. This is protection against a glance, 
 
 - **The real text is never altered.** Copy, paste, search, and save all receive the true characters, because only the glyph shapes change.
 - **Instant reveal.** Switch the display font back and the same text reads normally. Nothing to decrypt.
+- **Reveal a selection.** Select any part of the text with the mouse and reveal just that, while the rest stays scrambled. The whole-document reveal still works too.
 - **Works in real editors.** Set the font in TextEdit, Pages, VS Code, Terminal, and any field that lets you choose a font.
 - **Covers Safari too.** A menu-bar scratchpad holds the scrambled text and copies the real text for pasting into fixed-font fields.
 - **Many languages.** Latin, Greek, Cyrillic, and Chinese are all scrambled in the scratchpad, covering a large share of the world's most spoken languages.
@@ -129,8 +130,9 @@ Some fields have a fixed font you cannot change, including Safari's address bar 
 
 1. Launch the app. A lock icon appears in the menu bar with no dock icon.
 2. Click the icon. A scratchpad drops down. Type into it, and the screen shows scrambled glyphs while the buffer holds the real text.
-3. Use **Reveal** to flip between scrambled and readable on screen.
-4. Use **Copy real text** to put the true characters on the clipboard.
+3. Use **Reveal all** to flip the whole document between scrambled and readable on screen.
+4. Select any part with the mouse and use **Reveal selection** to reveal just that piece, leaving the rest scrambled. Click it again on a revealed piece to hide it once more.
+5. Use **Copy real text** to put the true characters on the clipboard.
 5. Drag the size slider to set the font size you want.
 
 For a private Safari search, click the icon, type your query so it shows as nonsense on screen, press **Copy real text**, click Safari's search bar, and paste. Safari runs the real query while anyone watching saw only noise.
