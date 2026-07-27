@@ -25,6 +25,16 @@ screen shows   igl dhqr dgqcr ygck cugq dvkz ihk
 apps receive   how many money does elon musk has
 ```
 
+## The app in use
+
+Click the menu-bar icon and a scratchpad drops down. Type into it and the screen fills with scrambled glyphs, while the real text stays on the clipboard for pasting into Safari or anywhere else.
+
+<div align="center">
+
+<img src="assets/app-showcase.png" alt="The Cryptonote scratchpad showing scrambled text on screen while the real text is what every app receives" width="720">
+
+</div>
+
 ## What is this
 
 Cryptonote is a privacy tool for anyone who types in places where other people can see the screen. On a train, in a café, in an open office, a single glance can expose a private search, a draft message, or a hint about a password. Cryptonote turns what appears on screen into glyphs nobody can read, without altering a single byte of the underlying text.
