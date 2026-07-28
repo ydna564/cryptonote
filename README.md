@@ -4,7 +4,7 @@
 
 # Cryptonote
 
-### On-screen text scrambling for macOS that keeps the real characters underneath.
+### On-screen text scrambling for macOS that keeps the real characters underneath & intuitive note-taking tool
 
 </div>
 
