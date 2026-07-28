@@ -8,7 +8,7 @@
 
 </div>
 
-Cryptonote makes anything you type render as unreadable glyphs on screen, while every app, search box, and your clipboard still receive the true text. A person glancing at your screen sees nonsense. Your search still runs, your note still saves, your message still sends. Turn the mode off and the same text becomes readable again.
+Cryptonote makes anything you type render as unreadable glyphs on screen, while every app, search box, and your clipboard still receive the true text. A person glancing at your screen sees nonsense. Your search still runs, your note still saves, your message still sends. Turn the mode off and the same text becomes readable again. Meanwhile, it also serves as a seamless and intuitive note-taking tool. Nestled conveniently in your Mac's menu bar, it allows you to capture fleeting thoughts and sudden inspirations the moment they arise. Whenever an idea sparks, you can effortlessly jot it down, ensuring your creative moments are always preserved and that no brilliant idea ever fades before you have the chance to record it. 
 
 <div align="center">
 
